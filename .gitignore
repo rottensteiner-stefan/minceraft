@@ -21,3 +21,12 @@ node_modules/
 !/.agents/notes/.gitkeep
 /.agents/MEMORY.md
 /.agents/BACKLOG.md
+
+# Originals / DCC sources never go into git (engine ADR 0058); durable copy in Google Drive
+# "Small-World-Machine/<repo>/..." with MANIFEST.txt. raw/ is local staging only.
+raw/
+tripo-out/
+tripo-gltf/
+*.blend
+*.blend1
+*.fbx
