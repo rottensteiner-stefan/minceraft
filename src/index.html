@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minceraft — Small World Machine</title>
+    <link rel="icon" type="image/webp" href="/favicon.webp" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background-color: #0b0e13;
+        overflow: hidden;
+      }
+      #SmallWorldMachine {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #voxel-stats {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 10;
+        padding: 10px 14px;
+        background: rgba(10, 12, 16, 0.82);
+        border: 1px solid #2a3140;
+        border-radius: 8px;
+        color: #dbe4f0;
+        font: 12px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
+        pointer-events: none;
+        user-select: none;
+        min-width: 220px;
+      }
+      #voxel-hint {
+        position: fixed;
+        bottom: 14px;
+        left: 14px;
+        z-index: 10;
+        padding: 8px 12px;
+        background: rgba(10, 12, 16, 0.7);
+        border: 1px solid #2a3140;
+        border-radius: 8px;
+        color: #8ba0bd;
+        font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+        pointer-events: none;
+        user-select: none;
+      }
+      #voxel-stats .stat-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      #voxel-stats .stat-row span {
+        color: #7d8aa0;
+      }
+      #voxel-stats .stat-row b {
+        color: #e8eef7;
+        font-weight: 600;
+      }
+      #voxel-crosshair {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        width: 18px;
+        height: 18px;
+        transform: translate(-50%, -50%);
+        z-index: 9;
+        pointer-events: none;
+      }
+      #voxel-crosshair::before,
+      #voxel-crosshair::after {
+        content: "";
+        position: absolute;
+        background: rgba(255, 255, 255, 0.82);
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.9);
+      }
+      #voxel-crosshair::before {
+        left: 50%;
+        top: 0;
+        width: 2px;
+        height: 100%;
+        transform: translateX(-50%);
+      }
+      #voxel-crosshair::after {
+        top: 50%;
+        left: 0;
+        height: 2px;
+        width: 100%;
+        transform: translateY(-50%);
+      }
+      #damage-flash {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle, rgba(255, 0, 0, 0) 35%, rgba(220, 20, 20, 0.65) 100%);
+        pointer-events: none;
+        z-index: 15;
+        opacity: 0;
+        transition: opacity 0.2s ease-out;
+      }
+      #voxel-hud {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        pointer-events: none;
+        user-select: none;
+      }
+      #voxel-health {
+        display: flex;
+        gap: 3px;
+        font-size: 16px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+      }
+      #voxel-hotbar {
+        display: flex;
+        gap: 4px;
+        padding: 4px;
+        background: rgba(16, 20, 28, 0.88);
+        border: 2px solid #3a4454;
+        border-radius: 6px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+      }
+      .hotbar-slot {
+        width: 44px;
+        height: 44px;
+        border: 2px solid #232a36;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.04);
+        color: #cfd8e6;
+        font: 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        transition: all 0.15s ease;
+      }
+      .hotbar-slot .slot-num {
+        font-size: 9px;
+        color: #7d8ea6;
+      }
+      .hotbar-slot.active {
+        border-color: #f6c445;
+        background: rgba(246, 196, 69, 0.15);
+        box-shadow: 0 0 8px rgba(246, 196, 69, 0.4);
+        transform: scale(1.08);
+      }
+      #death-screen {
+        position: fixed;
+        inset: 0;
+        background: rgba(110, 12, 12, 0.78);
+        backdrop-filter: blur(4px);
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 25;
+        color: #fff;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      #death-screen h1 {
+        font-size: 42px;
+        margin: 0 0 10px 0;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+      }
+      #death-screen p {
+        font-size: 15px;
+        color: #e0d0d0;
+        margin: 0 0 20px 0;
+      }
+      #btn-respawn {
+        padding: 10px 24px;
+        background: #2a3444;
+        border: 2px solid #6b7c96;
+        border-radius: 6px;
+        color: #fff;
+        font: 600 15px ui-monospace, SFMono-Regular, Menlo, monospace;
+        cursor: pointer;
+        pointer-events: auto;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+      #btn-respawn:hover {
+        background: #3c4b62;
+        border-color: #8da2c4;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="damage-flash" aria-hidden="true"></div>
+    <div id="death-screen">
+      <h1>You died!</h1>
+      <p>Score: 0 · Press Space or Click below to Respawn</p>
+      <button id="btn-respawn">Respawn</button>
+    </div>
+    <div id="voxel-stats" role="status"></div>
+    <div id="voxel-hint">
+      click to capture · WASD move · Space jump · LMB / F / Q break · RMB / E / R place · 1-5 / scroll select block · ESC release
+    </div>
+    <div id="voxel-hud">
+      <div id="voxel-health" role="status" aria-label="Health"></div>
+      <div id="voxel-hotbar" role="toolbar" aria-label="Block Selection">
+        <div class="hotbar-slot active" data-slot="0"><span class="slot-num">1</span>Dirt</div>
+        <div class="hotbar-slot" data-slot="1"><span class="slot-num">2</span>Stone</div>
+        <div class="hotbar-slot" data-slot="2"><span class="slot-num">3</span>Wood</div>
+        <div class="hotbar-slot" data-slot="3"><span class="slot-num">4</span>Water</div>
+        <div class="hotbar-slot" data-slot="4"><span class="slot-num">5</span>Grass</div>
+      </div>
+    </div>
+    <div id="voxel-crosshair" aria-hidden="true"></div>
+    <canvas id="SmallWorldMachine"></canvas>
+    <script type="module" src="/src/App.ts"></script>
+  </body>
+</html>

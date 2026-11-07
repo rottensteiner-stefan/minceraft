@@ -1,0 +1,34 @@
+// Voxel block vertex shader -- WEBGL1 / GLSL100 (WebGL1 atlas material; see docs/log.md).
+// WebGL1 has no `sampler2DArray`, so the palette is a SINGLE 2D atlas (`u_diffuseMap`) and the
+// tile-local mesher UVs are remapped into the 2D atlas block in the FRAGMENT stage
+// (`BlockMaterial.frag.glsl100`): the greedy mesher's block-unit UVs are tiled per voxel there
+// with `fract`, the exact semantics of the array-texture tiers (`fract(v_uv)`), so merged quads
+// repeat their tile instead of stretching. This vertex only forwards the RAW mesher UVs and the
+// per-vertex atlas layer (`a_color.x`) as a float varying -- GLSL ES 1.00 has no `flat`, but the
+// layer is identical on all four corners of every face and every merged quad, so the interpolated
+// value stays constant across the primitive.
+// Layer, AO and baked light travel per vertex in the vertex colour exactly like the other tiers
+// (color.x = layer, color.y = AO, color.z = baked light).
+attribute vec3 a_position;
+attribute vec3 a_normal;
+attribute vec2 a_uv;
+attribute vec4 a_color;
+
+uniform mat4 u_vp;
+uniform mat4 u_model;
+
+varying vec3 v_normal;
+varying vec2 v_uv;     // raw mesher UVs in block units (0..w across a greedy-merged quad)
+varying float v_layer; // atlas tile index (`a_color.x`, constant per face/quad)
+varying float v_ao;
+varying float v_light;
+
+void main() {
+    vec4 wp = u_model * vec4(a_position, 1.0);
+    v_normal = normalize(mat3(u_model) * a_normal);
+    v_uv = a_uv;
+    v_layer = floor(a_color.x + 0.5);
+    v_ao = a_color.y;
+    v_light = a_color.z;
+    gl_Position = u_vp * wp;
+}

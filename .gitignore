@@ -1,0 +1,23 @@
+# IDE
+.idea
+
+# Code
+node_modules/
+
+# Misc
+**/.DS_Store
+/.claude/
+/var/
+
+# Build output
+/dist/
+
+# vitest --coverage output
+/coverage/
+
+# Local agent working material (see engine repo conventions)
+/.agents/scratches/
+/.agents/notes/*
+!/.agents/notes/.gitkeep
+/.agents/MEMORY.md
+/.agents/BACKLOG.md

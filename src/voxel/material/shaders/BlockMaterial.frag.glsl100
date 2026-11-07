@@ -1,0 +1,45 @@
+// Voxel block fragment shader -- WEBGL1 / GLSL100 (same lighting contract as the WebGL2/GLSL300
+// and WebGPU/WGSL paths, see BlockMaterial.frag.glsl -- ambient floor, AO dim, baked light and
+// the water alpha all behave identically). The palette is a 2D atlas here, so every sample is
+// remapped from the root tile selected by the per-vertex `v_layer` (`u_atlasGrid.x/y`) and then
+// TEXEL-LOCKED to a texel centre INSIDE that tile (`u_atlasGrid.zw` = atlas pixel size): sampling
+// exactly on a tile boundary under NEAREST would otherwise reach into the neighbour tile -- the
+// seam problem the array texture eliminated by construction.
+// `fract(v_uv)` tiles the greedy mesher's block-unit UVs per voxel EXACTLY like `fract(v_uv)` on
+// the array-texture tiers -- merged quads repeat their tile per block instead of stretching.
+// WebGL1 writes display-referred directly (no displayToTarget; MetalRelief precedent, ADR 0049).
+precision highp float;
+
+varying vec3 v_normal;
+varying vec2 v_uv;     // raw mesher UVs in block units (0..w across a greedy-merged quad)
+varying float v_layer; // atlas tile index (constant per face/quad)
+varying float v_ao;
+varying float v_light;
+
+uniform sampler2D u_diffuseMap;
+uniform vec4 u_matParam0; // [daylight, sunDirection.xyz]
+uniform vec4 u_matParam1; // [lightTint.rgb, 0]
+uniform vec4 u_atlasGrid; // [cols, rows, atlasWidthPx, atlasHeightPx]
+
+void main() {
+    // Root tile (col, row) + per-block tiling. The formula matches the atlas factory and the
+    // data-layer tests (`mod`/`floor`); `fract` repeats the tile per voxel on merged quads.
+    vec2 tile = vec2(mod(v_layer, u_atlasGrid.x), floor(v_layer / u_atlasGrid.x));
+    vec2 uv = tile / u_atlasGrid.xy + fract(v_uv);
+    // Texel-lock: `floor(px) + 0.5` maps every pixel to the texel centre of its OWN tile, so the
+    // seam between two tiles never samples across into the neighbour (`u_atlasGrid.zw` px atlas).
+    vec2 px = uv * u_atlasGrid.zw;
+    vec2 locked = (floor(px) + vec2(0.5)) / u_atlasGrid.zw;
+    vec4 tex = texture2D(u_diffuseMap, locked);
+
+    vec3 normal = normalize(v_normal);
+    vec3 lightDir = normalize(u_matParam0.yzw);
+    float ndl = clamp(dot(normal, lightDir), 0.0, 1.0);
+    float ambient = 0.34;
+    float ao = clamp(v_ao, 0.0, 1.0);
+    float lightFactor = clamp(v_light, 0.0, 1.0) * clamp(u_matParam0.x, 0.15, 1.0);
+    // The ambient floor stays inside the direct term (faces with ndl == 0 stay readable).
+    vec3 lit = tex.rgb * mix(ambient, 1.0, ao) * (ambient + (1.0 - ambient) * ndl) * lightFactor * u_matParam1.rgb;
+
+    gl_FragColor = vec4(lit, tex.a);
+}

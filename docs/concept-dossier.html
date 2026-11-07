@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minceraft — Konzept-Dossier (M0–M5)</title>
+    <style>
+      :root {
+        --bg: #0b0e13;
+        --panel: #12161d;
+        --panel-2: #171c25;
+        --line: #242c3a;
+        --text: #e3e9f2;
+        --muted: #8a96a9;
+        --grass: #3e8440;
+        --dirt: #7d5c3e;
+        --stone: #7d7f85;
+        --accent: #4fc3a1;
+        --warn: #d9a14b;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.65;
+        padding: 3rem 1.5rem 5rem;
+      }
+      .wrap { max-width: 1080px; margin: 0 auto; }
+      h1 { font-size: 2rem; letter-spacing: -0.02em; margin-bottom: 0.35rem; }
+      h2 { font-size: 1.25rem; margin: 2.6rem 0 0.8rem; color: var(--accent); }
+      h3 { font-size: 1rem; margin: 1.4rem 0 0.4rem; color: var(--text); }
+      p { margin: 0.55rem 0; color: var(--text); }
+      .sub { color: var(--muted); margin-bottom: 1.6rem; }
+      .tag { display: inline-block; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--line); border-radius: 999px; padding: 0.25rem 0.8rem; margin: 0.15rem 0.3rem 0.15rem 0; }
+      .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem 1.4rem; margin: 1rem 0; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+      .bevelled { width: 120px; height: 120px; transform: perspective(420px) rotateX(38deg) rotateZ(45deg); background: linear-gradient(180deg, var(--grass) 0 26%, var(--dirt) 26% 62%, var(--stone) 62% 100%); border: 1px solid #0e1217; box-shadow: 0 22px 34px rgba(0,0,0,0.45); margin: 0 auto 1.6rem; }
+      .bevelled::before, .bevelled::after { content: ""; position: absolute; inset: 0; }
+      table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.8rem 0; }
+      th, td { text-align: left; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { color: var(--muted); font-weight: 500; }
+      td b { color: var(--accent); }
+      .sm { color: var(--muted); font-size: 0.86rem; }
+      .warn { color: var(--warn); }
+      code { background: #0d1117; border: 1px solid var(--line); border-radius: 6px; padding: 0.1rem 0.35rem; font-size: 0.85em; }
+      .m { color: var(--accent); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; }
+      ul, ol { padding-left: 1.4rem; margin: 0.5rem 0; }
+      li { margin: 0.3rem 0; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="bevelled"></div>
+      <h1>Minceraft</h1>
+      <div class="sub">Voxel Sandbox · Kampagne M0–M5 · Small World Machine · Proof-of-Contract-Prototyp, kein Engine-Fork</div>
+      <span class="tag">app-level</span><span class="tag">webgl2 first</span><span class="tag">cc0-klare Assets</span><span class="tag">worker later</span>
+
+      <p>
+        Kein „Minceraft nachbauen" — ein <b>winziges Fenster, das sich so anfühlt</b>: ein App-Level-
+        Prototyp, der die vier harten Probleme sauber löst (<i>Daten spärlich halten, Meshing im Worker,
+        Grid-Kollision, Dirty-Nachbarschafts-Remesh</i>) und dabei <b>bewusst</b> auf Mobs, Netzwerk,
+        Redstone und echtes Licht verzichtet. Basis: Forschungs-Dossier
+        aus der Engine-Monorepo-Zeit (53 Quellen, lokales Arbeitsmaterial, nicht mehr vorhanden) + Dave-Integrationsreport.
+      </p>
+
+      <h2>Warum überhaupt Voxel in SWM</h2>
+      <div class="card">
+        <p>
+          SWM ist eine <b>Render-Engine, keine Game-Engine</b>. Die Voxel-Sache bleibt deshalb ein
+          kohäsives Paket auf App-Ebene, das SWM über die öffentliche Fläche konsumiert — kein Fork von
+          Engine-Interna. Die Architektur folgt dem bewiesenen Noa-Muster (bloxd.io, Minceraft-Classic-Web);
+          die Reuse-/Bypass-Trennung ist explizit (Dave-Report §2.4):
+        </p>
+        <ul>
+          <li><b>Reuse:</b> Scene-Graph + Object3D, Material-System (CustomShaderMaterial, TextureArray), Frustum-Cull, ThreadPool, FPS-Controller-Skelett, App-Docs-Konvention.</li>
+          <li><b>Bypass:</b> PhysicsSystem für Terrain (kein Tri-Mesh — Voxel-Grid-Sweep), Interleaved-Buffer, glTF-WorldWriter für Chunks, globale Singletons.</li>
+        </ul>
+      </div>
+
+      <h2>Kernentscheidungen (Dossier §4.4)</h2>
+      <div class="card">
+        <table>
+          <tr><th>Entscheidung</th><th>Stand</th></tr>
+          <tr><td>#1 Ablage</td><td><b>Sample-App <code>src/</code></b> (User-Entscheid 2026-10-19)</td></tr>
+          <tr><td>#2 Kollision</td><td><b>umgesetzt in M1:</b> eigener <code>VoxelPlayerCollision</code>-Behavior + <code>VoxelSweep</code> (Luanti-Port), kein FPSController-Patch</td></tr>
+          <tr><td>#3 Greedy vs. Naive+AO</td><td>M0/M1 Naive-Culling → M2 echtes AO → M5 AO-kompatibles Greedy (§5 S3, teilgelöst)</td></tr>
+          <tr><td>#4 Datenformat</td><td class="warn">M3: eigener kompakter Region-Store (OPFS/indexedDB), Anvil nur bei echten MC-Saves (§5 S5)</td></tr>
+          <tr><td>#5 WebGPU-Roadmap</td><td><b>WebGL2-Default, WebGPU als späterer Qualitätspfad</b> (§5 S1/S6, Anti-Pattern „WebGPU-only")</td></tr>
+        </table>
+      </div>
+
+      <h2>Meilenstein-Plan</h2>
+      <table>
+        <tr><th>Milestone</th><th>Inhalt</th><th>Umfang</th></tr>
+        <tr><td class="m">M0 ✅</td><td>Skelett + EIN statischer Chunk — Mesh↔Engine-Vertrag, Array-Texture, Naive-Mesher, Orbit-Verifikation</td><td>S</td></tr>
+        <tr><td class="m">M1 ✅</td><td>Unendlich-Streaming, Worker-Meshing, Nahtfreiheit, Voxel-AABB-Sweep-Kollision (<b>2026-10-19:</b> dedizierter Vite-Module-Worker statt ThreadPool gem. §5 S2, kein Engine-Change; Spawn/Walk/Fly, no step-up/jump → M4)</td><td>L</td></tr>
+        <tr><td class="m">M2</td><td>Break/Place + korrektem 1-Chunk-Remesh, Minceraft-Standard-Look (gebäcktes AO)</td><td>M</td></tr>
+        <tr><td class="m">M3</td><td>Save/Load (eigener kompakter Binär-Store), Tageslicht-Regel + billigster Punktflood</td><td>M</td></tr>
+        <tr><td class="m">M4</td><td>Spielbare Survival-Schleife ohne Mobs/Inventory — Spawn, Bauen, Tag/Nacht, Respawn</td><td>S–M</td></tr>
+        <tr><td class="m">M5</td><td>Härtung + Performance-Validierung (gemessene Stabilität), Messzahlen in docs/research</td><td>M</td></tr>
+      </table>
+
+      <h2>Expliziter Scope-Cut</h2>
+      <div class="card">
+        <p class="sm">
+          Kein echtes Minceraft-Licht (Torch-Gradient mit Occlusion) · keine Mobs/NPCs · keine Entity-
+          Physik über PhysicsSystem · kein Multiplayer/Netzwerk · kein Redstone · kein Inventory/Crafting ·
+          keine Flüssigkeits-Updates · keine Modding-API · keine Engine-Core-Änderung, solange kein harter
+          Blocker sie beweist.
+        </p>
+      </div>
+
+      <h2>Steuerung & Eingabe-Architektur</h2>
+      <div class="card">
+        <p>
+          Für das authentische Spielgefühl (WASD, Pointer Lock, Break/Place, Trackpad-Gesten auf macOS sowie Gamepad)
+          wurde die Eingabe-Referenz analysiert und dokumentiert:
+          <br />
+          👉 <b><a href="controls.md" style="color: var(--accent); text-decoration: underline;">Steuerungs-Referenzdossier: Tastatur, Maus, Trackpad &amp; Gamepad (PC, macOS, PS4/PS5 &amp; Switch)</a></b>
+        </p>
+        <p class="sm" style="margin-top:0.4rem;">
+          Enthält vollständige Standardbelegung (Java &amp; Bedrock Edition), Konsolen-Layouts für PS4/PS5 (DualShock 4 / DualSense)
+          und Nintendo Switch (Joy-Con / Pro Controller), macOS-Modifier-Konflikte (Cmd+Q, Ctrl-Click, fn-F3),
+          HTML5 Gamepad API Mapping sowie konkrete M2-Empfehlungen für SWM.
+        </p>
+      </div>
+
+      <h2>Lizenz- & Asset-Haltung</h2>
+      <div class="card">
+        <p>
+          M0-Palette ist <b>prozedural erzeugt</b> (Canvas-TextureArray, NEAREST/CLAMP) — kein Mojang-Asset,
+          kein Lizenz-Borrow, CC0 per Konstruktion. Falls später Block-Texturen geborgt werden: nur
+          <b>MIT/Apache-2.0</b>-Quellen (<code>gpucraft</code>, <code>GanVoxelWorld</code>); SWM-Asset-Pack
+          bleibt CC0/self-made (Dossier §5.4).
+        </p>
+      </div>
+
+      <div class="card sm">
+        <p style="margin:0">
+          Ablage: <code>src/</code> · Log: <code>docs/log.md</code> (lebendes Gedächtnis) ·
+          Steuerung: <a href="controls.md" style="color: var(--accent);"><code>docs/controls.md</code></a> ·
+          Forschung: <code>docs/research/</code>.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

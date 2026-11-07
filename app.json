@@ -1,0 +1,16 @@
+{
+  "id": "minceraft",
+  "name": "Minceraft",
+  "version": "0.1.0",
+  "schemaVersion": 1,
+  "description": "Chunk-streamed voxel world application with worker meshing, baked AO/daylight, and IndexedDB delta persistence.",
+  "engine": ">=0.115.0",
+  "entry": "index.html",
+  "levels": [],
+  "characters": [],
+  "kits": [],
+  "code": {
+    "module": "./index.ts"
+  },
+  "save": { "schemaVersion": 1 }
+}
