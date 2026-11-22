@@ -1,4 +1,5 @@
 import {
+  isTextureArray,
   CustomShaderMaterial,
   ShaderPropertyType,
   StandardWebGPULayout,
@@ -41,7 +42,7 @@ export class BlockMaterial extends CustomShaderMaterial {
   private readonly _atlasGridLane: number[] = [0, 0, 0, 0];
 
   constructor(atlas: Texture | TextureArray) {
-    const arrayPath = (atlas as TextureArray).isTextureArray === true;
+    const arrayPath = isTextureArray(atlas);
     super({
       sources: arrayPath
         ? {

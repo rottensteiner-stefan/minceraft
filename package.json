@@ -16,7 +16,7 @@
     "kill:vite": "node .agents/skills/reset-vite/reset-vite.mjs"
   },
   "dependencies": {
-    "@small-world-machine/engine": "https://github.com/rottensteiner-stefan/small-world-machine/releases/download/packages-0.122.0/small-world-machine-engine-0.122.0.tgz"
+    "@small-world-machine/engine": "https://github.com/rottensteiner-stefan/small-world-machine/releases/download/packages-0.128.0/small-world-machine-engine-0.128.0.tgz"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",
