@@ -16,16 +16,16 @@
     "kill:vite": "node .agents/skills/reset-vite/reset-vite.mjs"
   },
   "dependencies": {
-    "@small-world-machine/engine": "https://github.com/rottensteiner-stefan/small-world-machine/releases/download/packages-0.128.0/small-world-machine-engine-0.128.0.tgz"
+    "@small-world-machine/engine": "https://github.com/rottensteiner-stefan/small-world-machine/releases/download/packages-0.129.0/small-world-machine-engine-0.129.0.tgz"
   },
   "devDependencies": {
-    "@types/node": "^26.1.2",
-    "@webgpu/types": "^0.1.71",
-    "jsdom": "^30.0.1",
+    "@types/node": "^26.6.6",
+    "@webgpu/types": "^0.1.74",
+    "jsdom": "^31.0.1",
     "pngjs": "^7.0.0",
-    "puppeteer": "^25.4.0",
-    "typescript": "^6.0.3",
-    "vite": "^8.2.0",
-    "vitest": "^5.0.5"
+    "puppeteer": "^25.18.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
   }
 }

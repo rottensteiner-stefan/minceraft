@@ -22,7 +22,7 @@ import puppeteer from "puppeteer";
 import { detectBlankCanvas, PREVIEW_ARGS, PREVIEW_ORIGIN, waitForServer } from "./lib/preview-utils.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, "..", "..");
+const REPO_ROOT = path.resolve(__dirname, "..");
 const APP_URL = `${PREVIEW_ORIGIN}/src/index.html`;
 
 const results = [];

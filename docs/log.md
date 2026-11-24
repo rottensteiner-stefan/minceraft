@@ -720,3 +720,21 @@ Folge-Commit).
 `ChunkWorld` (Map + Lebenszyklus), `TerrainGenerator` (deterministisches Noise-Heightfield),
 `GreedyMesher` im `ThreadPool`-Worker, `MeshWorkerProtocol` (typisierte Transfer-Nachrichten),
 Voxel-AABB-Sweep-Resolver für den Spieler, Naht-freies Streaming. → Dossier §4.2 M1.
+
+---
+
+## 2026-11-24 — Dependency Upgrade: Engine 0.129.0 & Toolchain
+
+### Scope & Invariants
+- Bumped `@small-world-machine/engine` to release `packages-0.129.0`.
+- Synchronized `GlobalUniforms` std140 block layout in `src/voxel/material/shaders/BlockMaterial.vert.glsl` with the engine 0.129.0 chunk (`u_toneMappingMode`, `u_toneMappingWhite`, `u_ambientGround`).
+- Corrected `REPO_ROOT` calculation in `scripts/check-voxel-m7.mjs` and `scripts/check-voxel-webgl1.mjs` to target the standalone project root.
+- Updated all devDependencies to their latest releases (`typescript` 7.0.2, `vite` 8.3.8, `vitest` 5.1.1, `puppeteer` 25.18.1, `jsdom` 31.0.1, `@types/node` 26.6.6, `@webgpu/types` 0.1.74).
+
+### Verification
+- `npm run typecheck`: clean (tsc 7.0.2).
+- `npm test`: 26 test files / 213 tests passed.
+- `npm run build`: Vite production bundle generated without errors.
+- `npm run check:voxel-m7`: GATE GREEN (worker pool & OPFS delta persistence verified).
+- `npm run check:voxel-webgl1`: GATE GREEN (WebGL1 fallback & 2D atlas pipeline verified).
+
