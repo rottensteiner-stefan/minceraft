@@ -35,6 +35,7 @@ minceraft/
 │   └── *.test.ts                 # Voxel engine and math unit tests
 ├── AGENTS.md                     # Agent guidance and workflow instructions
 ├── CLAUDE.md                     # Legacy agent pointer
+├── Makefile                      # Developer workflow commands (dev, restart, kill, check)
 ├── app.json                      # ADR 0001 (vormals Engine-ADR 0041) game manifest
 ├── package.json                  # Pinned engine release dependency
 ├── tsconfig.json                 # Strict TypeScript configuration
