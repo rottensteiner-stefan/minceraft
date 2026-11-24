@@ -738,3 +738,10 @@ Voxel-AABB-Sweep-Resolver für den Spieler, Naht-freies Streaming. → Dossier �
 - `npm run check:voxel-m7`: GATE GREEN (worker pool & OPFS delta persistence verified).
 - `npm run check:voxel-webgl1`: GATE GREEN (WebGL1 fallback & 2D atlas pipeline verified).
 
+---
+
+## 2026-11-24 — Release v0.1.1 & Engine 0.129.2 Upgrade
+
+- Upgraded `@small-world-machine/engine` from `packages-0.129.0` to `packages-0.129.2`.
+- Bumped `package.json` and `app.json` to `0.1.1` (`engine: >=0.129.2`) and added `[0.1.1]` entry in `CHANGELOG.md`.
+- Verified `npm run typecheck`, `npm test`, and `npm run build`.
