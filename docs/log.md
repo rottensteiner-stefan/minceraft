@@ -745,3 +745,11 @@ Voxel-AABB-Sweep-Resolver für den Spieler, Naht-freies Streaming. → Dossier �
 - Upgraded `@small-world-machine/engine` from `packages-0.129.0` to `packages-0.129.2`.
 - Bumped `package.json` and `app.json` to `0.1.1` (`engine: >=0.129.2`) and added `[0.1.1]` entry in `CHANGELOG.md`.
 - Verified `npm run typecheck`, `npm test`, and `npm run build`.
+
+---
+
+## 2026-11-27 — Release v0.1.2 & Engine 0.129.3 Upgrade
+
+- Upgraded `@small-world-machine/engine` from `packages-0.129.2` to `packages-0.129.3`.
+- Bumped `package.json` and `app.json` to `0.1.2` (`engine: >=0.129.3`) and added `[0.1.2]` entry in `CHANGELOG.md`.
+- Verified `npm run typecheck`, `npm test`, and `npm run build`.

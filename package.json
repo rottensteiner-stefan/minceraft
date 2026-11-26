@@ -1,7 +1,7 @@
 {
   "name": "minceraft",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Minceraft — chunk-streamed voxel sandbox. Standalone project; it consumes Small World Machine as versioned packages (pinned release URLs).",
   "type": "module",
   "scripts": {
@@ -16,7 +16,7 @@
     "kill:vite": "node .agents/skills/reset-vite/reset-vite.mjs"
   },
   "dependencies": {
-    "@small-world-machine/engine": "https://github.com/rottensteiner-stefan/small-world-machine/releases/download/packages-0.129.2/small-world-machine-engine-0.129.2.tgz"
+    "@small-world-machine/engine": "https://github.com/rottensteiner-stefan/small-world-machine/releases/download/packages-0.129.3/small-world-machine-engine-0.129.3.tgz"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
